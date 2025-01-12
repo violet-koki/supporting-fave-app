@@ -5,7 +5,6 @@ import { firebaseApp } from './firebase'
 </script>
 
 <template>
-
   <RouterView />
 </template>
 
