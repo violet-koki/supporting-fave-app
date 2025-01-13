@@ -4,7 +4,8 @@
     <form @submit.prevent="submitComment">
       <div class="form-group">
         <label for="image" class="text-white">画像</label>
-        <input id="image" type="file" class="rounded border-2 border-gray-400" @change="e => imageFile = e.target.files[0]"/>
+        <input id="image" type="file" class="rounded border-2 border-gray-400"
+          @change="e => imageFile = e.target.files[0]" />
       </div>
       <div class="md:flex md:items-center mb-6">
         <div class="md:w-1/3">
@@ -18,7 +19,7 @@
         <div class="md:w-2/3">
           <input
             class="bg-gray-200 appearance-none border-2 border-gray-400 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-            type="text" defaultValue="" placeholder="姓" onChange="{onChangeLastName}" />
+            type="text" defaultValue="" placeholder="姓" onChange="{onChangeLastName}" v-model="formData.fullName" />
         </div>
       </div>
 
@@ -34,22 +35,23 @@
         <div class="md:w-2/3">
           <input
             class="bg-gray-200 appearance-none border-2 border-gray-400 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-            type="text" defaultValue="" placeholder="姓" onChange="{onChangeLastName}" />
+            type="text" defaultValue="" placeholder="姓" onChange="{onChangeLastName}" v-model="formData.favName" />
         </div>
       </div>
 
       <div class="form-group ">
-        <label for="content" class="block text-white font-bold md:text-left mb-1 md:mb-0 pr-4"
+        <label for="comment" class="block text-white font-bold md:text-left mb-1 md:mb-0 pr-4"
           htmlFor="inline-last-name">コメント</label>
-        <textarea id="content" class="rounded border-2 border-gray-400" v-model="formData.content" rows="4"
+        <textarea id="comment" class="rounded border-2 border-gray-400" v-model="formData.comment" rows="4"
           required></textarea>
       </div>
 
       <!-- プレビュー表示 -->
       <div v-if="showPreview" class="preview font-bold">
         <h3>プレビュー</h3>
-        <p class="rounded">名前: {{ formData.name }}</p>
-        <p class="rounded">コメント: {{ formData.content }}</p>
+        <p class="rounded">名前: {{ formData.fullName }}</p>
+        <p class="rounded">選手名: {{ formData.favName }}</p>
+        <p class="rounded">コメント: {{ formData.comment }}</p>
       </div>
 
       <div class="buttons">
@@ -64,15 +66,17 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import { collection, addDoc } from 'firebase/firestore'
-import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage'
-import { db, storage } from '@/firebase/init'
+import { ref as storageRef, uploadBytes, getDownloadURL, getStorage } from 'firebase/storage'
+import { getAuth } from "firebase/auth"
+import { db } from '@/firebase/index.ts'
 
 // フォームデータの状態管理
 const formData = reactive({
-  name: '',
-  content: '',
-  imageFile: null,
+  fullName: '',
+  favName: '',
+  comment: '',
 })
+const imageFile = ref(null)
 
 // プレビュー表示の状態管理
 const showPreview = ref(false)
@@ -83,20 +87,32 @@ const togglePreview = () => {
 }
 
 // フォーム送信処理
-const submitComment = () => {
+const submitComment = async () => {
   // ここにバリデーションや送信処理を追加
-  console.log('送信されたデータ:', formData)
+  // console.log('送信されたデータ:', formData)
   let imageUrl = null
 
-  if (imageFile.value) {
-    const storage = storageRef(storage, `posts/${Date.now()}_${imageFile.value.name}`)
-    await uploadBytes(storageReference, imageFile.value)
-    imageUrl = await getDownloadURL(storageReference)
-  }
+  // if (imageFile.value) {
+  //   const storage = getStorage();
+  //   const storageReference = storageRef(storage, `posts/${Date.now()}_${imageFile.value.name}`)
+  //   console.log(imageFile.value.name)
+  //   await uploadBytes(storageReference, imageFile.value)
+  //   imageUrl = await getDownloadURL(storageReference)
+  // }
+  const userId = getAuth().currentUser.uid
+  console.log(userId)
+  await addDoc(collection(db, 'posts'), {
+    comment: formData.comment,
+    fullName: formData.fullName,
+    favName: formData.favName,
+    createdAt: new Date(),
+    userId: userId
+  });
 
   // フォームのリセット
-  formData.name = ''
-  formData.content = ''
+  formData.fullName = ''
+  formData.favName = ''
+  formData.comment = ''
   showPreview.value = false
 }
 </script>

@@ -12,14 +12,16 @@
 
     <!-- メイン機能へのクイックアクセス -->
     <div class="grid grid-cols-2 gap-4 mb-6">
-      <button 
-        v-for="button in mainButtons" 
-        :key="button.id"
-        class="flex items-center justify-center p-4 rounded-lg"
-        :class="button.bgColor"
-      >
+      <button v-for="button in mainButtons" :key="button.id" class="flex items-center justify-center p-4 rounded-lg"
+        :class="button.bgColor">
         <component :is="button.icon" class="w-6 h-6 mr-2" />
         <span>{{ button.label }}</span>
+      </button>
+    </div>
+    <div>
+      <button class="flex items-center justify-center p-4 rounded-lg bg-blue-100"
+        @click="login">
+        サインアップ
       </button>
     </div>
 
@@ -27,11 +29,7 @@
     <section class="mb-6">
       <h2 class="text-xl font-bold mb-3">今日の注目対局</h2>
       <div class="space-y-3">
-        <div 
-          v-for="match in upcomingMatches" 
-          :key="match.id" 
-          class="p-3 bg-gray-50 rounded-lg"
-        >
+        <div v-for="match in upcomingMatches" :key="match.id" class="p-3 bg-gray-50 rounded-lg">
           <div class="font-medium">{{ match.player }}</div>
           <div class="text-sm text-gray-600">
             {{ match.event }} - {{ match.date }}
@@ -44,11 +42,7 @@
     <section>
       <h2 class="text-xl font-bold mb-3">最新ニュース</h2>
       <div class="space-y-3">
-        <div 
-          v-for="item in news" 
-          :key="item.id" 
-          class="p-3 border-b"
-        >
+        <div v-for="item in news" :key="item.id" class="p-3 border-b">
           <div class="font-medium">{{ item.title }}</div>
           <div class="text-sm text-gray-600">{{ item.date }}</div>
         </div>
@@ -59,6 +53,7 @@
 
 <script setup lang="ts">
 import { Bell, Calendar, Star, Trophy, Users } from 'lucide-vue-next'
+import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
 
 interface Match {
   id: number
@@ -81,19 +76,41 @@ interface MainButton {
 }
 
 const upcomingMatches: Match[] = [
-  { id: 1, player: "藤田晋", event: "Mリーグ", date: "2025/1/9 19:00" },
+  { id: 1, player: "堀慎吾", event: "Mリーグ", date: "2025/1/9 19:00" },
   { id: 2, player: "佐々木寿人", event: "天鳳名人戦", date: "2025/1/10 20:00" }
 ]
 
 const news: NewsItem[] = [
-  { id: 1, title: "藤田晋が連続トップ！驚異の4連勝", date: "2025/1/8" },
+  { id: 1, title: "堀慎吾が連続トップ！驚異の4連勝", date: "2025/1/8" },
   { id: 2, title: "佐々木寿人、天鳳名人戦で快進撃", date: "2025/1/7" }
 ]
+
+const login = () => {
+  signInWithPopup(getAuth(), new GoogleAuthProvider())
+    .then((result) => {
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+      // IdP data available using getAdditionalUserInfo(result)
+      // ...
+    }).catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.customData.email;
+      // The AuthCredential type that was used.
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      // ...
+    });
+}
 
 const mainButtons: MainButton[] = [
   {
     id: 1,
-    label: "プロ一覧",
+    label: "推し日記を投稿",
     icon: Star,
     bgColor: "bg-blue-100"
   },
@@ -114,6 +131,12 @@ const mainButtons: MainButton[] = [
     label: "ファン広場",
     icon: Users,
     bgColor: "bg-purple-100"
+  },
+  {
+    id: 5,
+    label: "サインイン",
+    icon: Users,
+    bgColor: "bg-red-100"
   }
 ]
 </script>
