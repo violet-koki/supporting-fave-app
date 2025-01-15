@@ -65,6 +65,7 @@
 </template>
 <script setup>
 import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import { collection, addDoc } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL, getStorage } from 'firebase/storage'
 import { getAuth } from "firebase/auth"
@@ -76,10 +77,11 @@ const formData = reactive({
   favName: '',
   comment: '',
 })
-const imageFile = ref(null)
+let imageFile = ref(null)
+const router = useRouter()
 
 // プレビュー表示の状態管理
-const showPreview = ref(false)
+const showPreview = ref(false) 
 
 // プレビューの切り替え
 const togglePreview = () => {
@@ -92,27 +94,32 @@ const submitComment = async () => {
   // console.log('送信されたデータ:', formData)
   let imageUrl = null
 
-  // if (imageFile.value) {
-  //   const storage = getStorage();
-  //   const storageReference = storageRef(storage, `posts/${Date.now()}_${imageFile.value.name}`)
-  //   console.log(imageFile.value.name)
-  //   await uploadBytes(storageReference, imageFile.value)
-  //   imageUrl = await getDownloadURL(storageReference)
-  // }
-  const userId = getAuth().currentUser.uid
-  console.log(userId)
+  if (imageFile.value) {
+    const storage = getStorage();
+    const storageReference = storageRef(storage, `posts/${Date.now()}_${imageFile.value.name}`)
+    await uploadBytes(storageReference, imageFile.value)
+    imageUrl = await getDownloadURL(storageReference)
+  }
+  const userId = getAuth().currentUser ? getAuth().currentUser.uid : '';
   await addDoc(collection(db, 'posts'), {
     comment: formData.comment,
     fullName: formData.fullName,
     favName: formData.favName,
     createdAt: new Date(),
     userId: userId
-  });
+  })
+  .then(
+    router.push({ name: 'registerComplete' })
+  )
+  .catch()
+  .finally()
+  //Todo あとでエラーハンドリング実装
 
   // フォームのリセット
   formData.fullName = ''
   formData.favName = ''
   formData.comment = ''
+  imageFile = null
   showPreview.value = false
 }
 </script>

@@ -3,6 +3,8 @@ import Rank from '../views/Rank.vue'
 import Login from '../components/login/index.vue'
 import Home from '../components/home/index.vue'
 import RegisterComment from '../components/register-comment/index.vue'
+import RegisterComplete from '../components/register-comment/Complete.vue'
+import CommentList from '../components/comment/List.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,6 +23,16 @@ const router = createRouter({
       path: '/register-comment',
       name: 'register',
       component: RegisterComment,
+    },
+    {
+      path: '/register-complete',
+      name: 'registerComplete',
+      component: RegisterComplete,
+    },
+    {
+      path: '/comment-list',
+      name: 'commentList',
+      component: CommentList,
     },
     {
       path: '/about',

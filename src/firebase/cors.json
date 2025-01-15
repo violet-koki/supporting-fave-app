@@ -1,0 +1,11 @@
+[
+    {
+        "origin": [
+            "https://fave-app-18c04.firebaseapp.com/"
+        ],
+        "method": [
+            "GET, POST"
+        ],
+        "maxAgeSeconds": 3600
+    }
+]
