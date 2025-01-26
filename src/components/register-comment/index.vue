@@ -63,12 +63,12 @@
     </form>
   </div>
 </template>
-<script setup>
-import { ref, reactive } from 'vue'
+<script lang=ts setup>
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { collection, addDoc } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL, getStorage } from 'firebase/storage'
-import { getAuth } from "firebase/auth"
+import { onAuthStateChanged, getAuth } from "firebase/auth"
 import { db } from '@/firebase/index.ts'
 
 // フォームデータの状態管理
@@ -79,6 +79,7 @@ const formData = reactive({
 })
 let imageFile = ref(null)
 const router = useRouter()
+const uid = ref('')
 
 // プレビュー表示の状態管理
 const showPreview = ref(false) 
@@ -122,6 +123,20 @@ const submitComment = async () => {
   imageFile = null
   showPreview.value = false
 }
+
+onMounted(async () => {
+  await new Promise<void>((resolve) => {
+    const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
+      uid.value = user.uid;
+      resolve();
+    })
+  });
+
+  // コンポーネントのアンマウント時にリスナーを解除
+  onUnmounted(() => {
+      unsubscribe()
+  })
+})
 </script>
 
 <style scoped>

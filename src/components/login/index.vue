@@ -1,10 +1,16 @@
-<script lang="ts">
+<script lang="ts" setup>
 import { ref } from 'vue'
-import { getAuth, GoogleAuthProvider, signInWithRedirect } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect } from "firebase/auth";
 const msg = ref<string>('Welcome to Fave-App')
 const googleLogin = () => {
     const auth = getAuth();
-    signInWithRedirect(auth, new GoogleAuthProvider())
+    signInWithPopup(auth, new GoogleAuthProvider())
+        .then((result) => {
+            const credential = GoogleAuthProvider.credentialFromResult(result);
+            const token = credential.accessToken;
+            const user = result.user;
+            console.log(getAuth().currentUser.uid)
+        })
         .catch((error) => {
             // Handle Errors here.
             const errorCode = error.code;

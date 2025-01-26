@@ -131,12 +131,6 @@ const mainButtons: MainButton[] = [
     label: "ファン広場",
     icon: Users,
     bgColor: "bg-purple-100"
-  },
-  {
-    id: 5,
-    label: "サインイン",
-    icon: Users,
-    bgColor: "bg-red-100"
   }
 ]
 </script>
