@@ -4,12 +4,19 @@
     <form @submit.prevent="submitComment">
       <div class="form-group">
         <label for="image" class="text-white">画像</label>
-        <input id="image" type="file" class="rounded border-2 border-gray-400"
-          @change="e => imageFile = e.target.files[0]" />
+        <input
+          id="image"
+          type="file"
+          class="rounded border-2 border-gray-400"
+          @change="(e) => (imageFile = e.target.files[0])"
+        />
       </div>
       <div class="md:flex md:items-center mb-6">
         <div class="md:w-1/3">
-          <label class="block text-white font-bold md:text-right mb-1 md:mb-0 pr-4" htmlFor="inline-last-name">
+          <label
+            class="block text-white font-bold md:text-right mb-1 md:mb-0 pr-4"
+            htmlFor="inline-last-name"
+          >
             投稿者名
             <text class="text-white bg-red-500 font-normal text-sm ml-2 p-0.5 rounded-md">
               必須
@@ -19,13 +26,21 @@
         <div class="md:w-2/3">
           <input
             class="bg-gray-200 appearance-none border-2 border-gray-400 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-            type="text" defaultValue="" placeholder="姓" onChange="{onChangeLastName}" v-model="formData.fullName" />
+            type="text"
+            defaultValue=""
+            placeholder="姓"
+            onChange="{onChangeLastName}"
+            v-model="formData.fullName"
+          />
         </div>
       </div>
 
       <div class="md:flex md:items-center mb-6">
         <div class="md:w-1/3">
-          <label class="block text-white font-bold md:text-right mb-1 md:mb-0 pr-4" htmlFor="inline-last-name">
+          <label
+            class="block text-white font-bold md:text-right mb-1 md:mb-0 pr-4"
+            htmlFor="inline-last-name"
+          >
             選手名
             <text class="text-white bg-red-500 font-normal text-sm ml-2 p-0.5 rounded-md">
               必須
@@ -35,15 +50,30 @@
         <div class="md:w-2/3">
           <input
             class="bg-gray-200 appearance-none border-2 border-gray-400 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-            type="text" defaultValue="" placeholder="姓" onChange="{onChangeLastName}" v-model="formData.favName" />
+            type="text"
+            defaultValue=""
+            placeholder="姓"
+            onChange="{onChangeLastName}"
+            v-model="formData.favName"
+          />
         </div>
       </div>
 
-      <div class="form-group ">
-        <label for="comment" class="block text-white font-bold md:text-left mb-1 md:mb-0 pr-4"
-          htmlFor="inline-last-name">コメント</label>
-        <textarea id="comment" class="rounded border-2 border-gray-400" v-model="formData.comment" rows="4"
-          required></textarea>
+      <div class="form-group">
+        <label
+          for="comment"
+          class="block text-white font-bold md:text-left mb-1 md:mb-0 pr-4"
+          htmlFor="inline-last-name"
+        >
+          コメント
+        </label>
+        <textarea
+          id="comment"
+          class="rounded border-2 border-gray-400"
+          v-model="formData.comment"
+          rows="4"
+          required
+        ></textarea>
       </div>
 
       <!-- プレビュー表示 -->
@@ -55,20 +85,26 @@
       </div>
 
       <div class="buttons">
-        <button type="button" class="text-white bg-gray border-2 border-gray-400 rounded" @click="togglePreview">
+        <button
+          type="button"
+          class="text-white bg-gray border-2 border-gray-400 rounded"
+          @click="togglePreview"
+        >
           {{ showPreview ? 'プレビューを隠す' : 'プレビューを表示' }}
         </button>
-        <button type="submit" class="text-white bg-gray border-2 border-gray-400 rounded">投稿する</button>
+        <button type="submit" class="text-white bg-gray border-2 border-gray-400 rounded">
+          投稿する
+        </button>
       </div>
     </form>
   </div>
 </template>
-<script lang=ts setup>
+<script lang="ts" setup>
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { collection, addDoc } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL, getStorage } from 'firebase/storage'
-import { onAuthStateChanged, getAuth } from "firebase/auth"
+import { onAuthStateChanged, getAuth } from 'firebase/auth'
 import { db } from '@/firebase/index.ts'
 
 // フォームデータの状態管理
@@ -77,12 +113,12 @@ const formData = reactive({
   favName: '',
   comment: '',
 })
-let imageFile = ref(null)
+const imageFile = ref(null)
 const router = useRouter()
 const uid = ref('')
 
 // プレビュー表示の状態管理
-const showPreview = ref(false) 
+const showPreview = ref(false)
 
 // プレビューの切り替え
 const togglePreview = () => {
@@ -96,45 +132,43 @@ const submitComment = async () => {
   let imageUrl = null
 
   if (imageFile.value) {
-    const storage = getStorage();
+    const storage = getStorage()
     const storageReference = storageRef(storage, `posts/${Date.now()}_${imageFile.value.name}`)
     await uploadBytes(storageReference, imageFile.value)
     imageUrl = await getDownloadURL(storageReference)
   }
-  const userId = getAuth().currentUser ? getAuth().currentUser.uid : '';
+  const userId = getAuth().currentUser ? getAuth().currentUser.uid : ''
   await addDoc(collection(db, 'posts'), {
     comment: formData.comment,
     fullName: formData.fullName,
     favName: formData.favName,
     createdAt: new Date(),
-    userId: userId
+    userId: userId,
   })
-  .then(
-    router.push({ name: 'registerComplete' })
-  )
-  .catch()
-  .finally()
+    .then(router.push({ name: 'registerComplete' }))
+    .catch()
+    .finally()
   //Todo あとでエラーハンドリング実装
 
   // フォームのリセット
   formData.fullName = ''
   formData.favName = ''
   formData.comment = ''
-  imageFile = null
+  imageFile.value = null
   showPreview.value = false
 }
 
 onMounted(async () => {
   await new Promise<void>((resolve) => {
     const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
-      uid.value = user.uid;
-      resolve();
+      uid.value = user.uid
+      resolve()
     })
-  });
+  })
 
   // コンポーネントのアンマウント時にリスナーを解除
   onUnmounted(() => {
-      unsubscribe()
+    unsubscribe()
   })
 })
 </script>
@@ -179,7 +213,6 @@ button {
 }
 
 @media (min-width: 1024px) {
-
   .form-group {
     margin-bottom: 20px;
     /* より大きな余白 */

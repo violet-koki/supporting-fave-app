@@ -18,7 +18,7 @@ interface ChannelStatistics {
 const channels = ref([
   'UCZyvKmQRDoj8phel00S94EA',
   'UCt40tSdNIum1EzOyy-_K2HA',
-  'UCihYMokYrglpPKgjzbZYgqA'
+  'UCihYMokYrglpPKgjzbZYgqA',
 ])
 
 const channelStats = ref<ChannelStatistics[]>([])
@@ -33,16 +33,13 @@ const fetchChannelStatistics = async () => {
   try {
     const stats = await Promise.all(
       channels.value.map(async (channelId) => {
-        const response = await axios.get(
-          'https://www.googleapis.com/youtube/v3/channels',
-          {
-            params: {
-              part: 'statistics,snippet',
-              id: channelId,
-              key: apiKey
-            }
-          }
-        )
+        const response = await axios.get('https://www.googleapis.com/youtube/v3/channels', {
+          params: {
+            part: 'statistics,snippet',
+            id: channelId,
+            key: apiKey,
+          },
+        })
 
         const channel = response.data.items[0]
         return {
@@ -52,13 +49,13 @@ const fetchChannelStatistics = async () => {
           thumbnails: channel.snippet.thumbnails,
           subscriberCount: channel.statistics.subscriberCount,
           viewCount: channel.statistics.viewCount,
-          videoCount: channel.statistics.videoCount
+          videoCount: channel.statistics.videoCount,
         }
-      })
+      }),
     )
 
-    channelStats.value = stats.sort((a, b) =>
-      parseInt(b.subscriberCount) - parseInt(a.subscriberCount)
+    channelStats.value = stats.sort(
+      (a, b) => parseInt(b.subscriberCount) - parseInt(a.subscriberCount),
     )
   } catch (err) {
     error.value = `統計情報の取得に失敗しました: ${err instanceof Error ? err.message : '不明なエラー'}`
@@ -88,8 +85,12 @@ onMounted(() => {
     <div v-if="!loading && !error" class="stats-list">
       <div v-for="channel in channelStats" :key="channel.id" class="channel-item">
         <div class="channel-header">
-          <img v-if="channel.thumbnails?.default?.url" :src="channel.thumbnails.default.url" :alt="channel.title"
-            class="channel-avatar">
+          <img
+            v-if="channel.thumbnails?.default?.url"
+            :src="channel.thumbnails.default.url"
+            :alt="channel.title"
+            class="channel-avatar"
+          />
           <h2 class="channel-title">{{ channel.title }}</h2>
         </div>
 
@@ -109,11 +110,16 @@ onMounted(() => {
         </div>
 
         <div class="channel-description">
-          {{ channel.description?.slice(0, 150) }}{{ channel.description?.length > 150 ? '...' : '' }}
+          {{ channel.description?.slice(0, 150)
+          }}{{ channel.description?.length > 150 ? '...' : '' }}
         </div>
 
-        <a :href="`https://www.youtube.com/channel/${channel.id}`" target="_blank" rel="noopener noreferrer"
-          class="channel-link">
+        <a
+          :href="`https://www.youtube.com/channel/${channel.id}`"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="channel-link"
+        >
           チャンネルを見る
         </a>
       </div>
