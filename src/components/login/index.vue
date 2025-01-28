@@ -7,9 +7,10 @@ const googleLogin = () => {
   signInWithPopup(auth, new GoogleAuthProvider())
     .then((result) => {
       const credential = GoogleAuthProvider.credentialFromResult(result)
-      const token = credential.accessToken
+      if (credential) {
+        const token = credential.accessToken
+      }
       const user = result.user
-      console.log(getAuth().currentUser.uid)
     })
     .catch((error) => {
       // Handle Errors here.

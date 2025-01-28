@@ -8,7 +8,10 @@
           id="image"
           type="file"
           class="rounded border-2 border-gray-400"
-          @change="(e) => (imageFile = e.target.files[0])"
+          @change="(e: Event) => {
+            const target = e.target as HTMLInputElement;
+            imageFile = target.files ? target.files[0] : null;
+          }"
         />
       </div>
       <div class="md:flex md:items-center mb-6">
@@ -29,7 +32,6 @@
             type="text"
             defaultValue=""
             placeholder="姓"
-            onChange="{onChangeLastName}"
             v-model="formData.fullName"
           />
         </div>
@@ -53,7 +55,6 @@
             type="text"
             defaultValue=""
             placeholder="姓"
-            onChange="{onChangeLastName}"
             v-model="formData.favName"
           />
         </div>
@@ -113,7 +114,7 @@ const formData = reactive({
   favName: '',
   comment: '',
 })
-const imageFile = ref(null)
+const imageFile = ref<File | null>(null)
 const router = useRouter()
 const uid = ref('')
 
@@ -137,15 +138,20 @@ const submitComment = async () => {
     await uploadBytes(storageReference, imageFile.value)
     imageUrl = await getDownloadURL(storageReference)
   }
-  const userId = getAuth().currentUser ? getAuth().currentUser.uid : ''
+  const user = getAuth().currentUser
+  if (user) {
+    const uid = user ? user.uid : ''
+  }
   await addDoc(collection(db, 'posts'), {
     comment: formData.comment,
     fullName: formData.fullName,
     favName: formData.favName,
     createdAt: new Date(),
-    userId: userId,
+    userId: uid,
   })
-    .then(router.push({ name: 'registerComplete' }))
+    .then(() => {
+      return router.push({ name: 'registerComplete' })
+    })
     .catch()
     .finally()
   //Todo あとでエラーハンドリング実装
@@ -161,14 +167,9 @@ const submitComment = async () => {
 onMounted(async () => {
   await new Promise<void>((resolve) => {
     const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
-      uid.value = user.uid
+      uid.value = user ? user.uid : ''
       resolve()
     })
-  })
-
-  // コンポーネントのアンマウント時にリスナーを解除
-  onUnmounted(() => {
-    unsubscribe()
   })
 })
 </script>

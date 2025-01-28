@@ -44,16 +44,11 @@ const goList = () => {
 }
 onMounted(async () => {
   await new Promise<void>((resolve) => {
-    const unsubscribe = onAuthStateChanged(getAuth(), (user) => {
+    onAuthStateChanged(getAuth(), (user) => {
       resolve()
     })
   })
   await fetchData()
-
-  // コンポーネントのアンマウント時にリスナーを解除
-  onUnmounted(() => {
-    unsubscribe()
-  })
 })
 </script>
 <template>
