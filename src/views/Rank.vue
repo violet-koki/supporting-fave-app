@@ -73,17 +73,30 @@ onMounted(() => {
   <div class="channel-stats">
     <h1 class="main-title">プロ雀士 YouTubeチャンネル統計</h1>
 
-    <div v-if="loading" class="loading">
+    <div
+      v-if="loading"
+      class="loading"
+    >
       <div class="loading-spinner"></div>
       データを読み込み中...
     </div>
 
-    <div v-if="error" class="error">
+    <div
+      v-if="error"
+      class="error"
+    >
       {{ error }}
     </div>
 
-    <div v-if="!loading && !error" class="stats-list">
-      <div v-for="channel in channelStats" :key="channel.id" class="channel-item">
+    <div
+      v-if="!loading && !error"
+      class="stats-list"
+    >
+      <div
+        v-for="channel in channelStats"
+        :key="channel.id"
+        class="channel-item"
+      >
         <div class="channel-header">
           <img
             v-if="channel.thumbnails?.default?.url"
