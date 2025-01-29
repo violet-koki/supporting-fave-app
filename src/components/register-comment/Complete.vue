@@ -6,7 +6,7 @@ const goList = () => {
 }
 </script>
 <template>
-  <div class="comment-form bg-black">
+  <div class="comment-form bg-gray-900 h-screen">
     <h2 class="text-white"></h2>
     <div class="md:flex md:items-center mb-6 text-white">投稿が完了しました</div>
     <div class="buttons">

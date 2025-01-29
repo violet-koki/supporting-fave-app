@@ -1,23 +1,27 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
-import { collection, doc, DocumentSnapshot, getDoc, query, where, getDocs } from 'firebase/firestore'
-import { getAuth, onAuthStateChanged } from "firebase/auth"
+import { collection, doc, deleteDoc, query, where, getDocs } from 'firebase/firestore'
+import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { db } from '@/firebase/index.ts'
 import { onMounted, ref, onUnmounted } from 'vue'
 import type { Post } from '@/types/post.d'
+import DeleteModal from './deleteModal.vue'
 
 const router = useRouter()
-const userRef = collection(db, 'posts')
 const uid = ref('')
-const unsubscribe = ref()
 const items = ref('')
+const selectedItem = ref(null)
 const result = ref<Post[]>([])
+const isModalOpen = ref(false)
+const targetCommentId = ref<string | null>(null)
 const fetchData = async () => {
   // Todo エラーハンドリングの実装
   // if (!getAuth().currentUser) {
   //     console.log('User not found')
   //     return
   // }
+  result.value = []
+  console.log(uid.value)
   const postsRef = collection(db, 'posts')
   const q = query(postsRef, where('userId', '==', uid.value))
   const querySnapshot = await getDocs(q)
@@ -31,20 +35,42 @@ const fetchData = async () => {
         minute: '2-digit',
       })
       result.value.push({
+        docId: doc.id,
         favName: doc.data().favName,
         fullName: doc.data().fullName,
         createdAt: createdAt,
         comment: doc.data().comment,
       })
+      result.value.sort((a, b) => b.createdAt.localeCompare(a.createdAt, 'ja'))
     })
   }
 }
 const goList = () => {
   router.push({ name: 'commentList' })
 }
+const openModal = (item) => {
+  isModalOpen.value = true
+  selectedItem.value = item
+  targetCommentId.value = item.docId
+}
+const onCloseDeleteModal = () => {
+  isModalOpen.value = false
+}
+const deletePost = async () => {
+  try {
+    if (targetCommentId.value) {
+      await deleteDoc(doc(db, 'posts', targetCommentId.value))
+      await onCloseDeleteModal()
+      await fetchData()
+    }
+  } catch (e) {
+    console.error('Error deleting comment', e)
+  }
+}
 onMounted(async () => {
   await new Promise<void>((resolve) => {
     onAuthStateChanged(getAuth(), (user) => {
+      uid.value = user ? user.uid : ''
       resolve()
     })
   })
@@ -52,11 +78,14 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <div class="comment-form bg-black">
+  <div class="comment-form bg-gray-900 h-screen">
     <h2 class="text-white"></h2>
     <div class="md:flex md:items-center mb-6 text-white">投稿一覧</div>
     <div class="grid grid-cols-1 gap-6">
-      <div v-for="item in result" class="bg-gray-800 rounded-lg shadow-lg p-6">
+      <div
+        v-for="item in result"
+        class="bg-gray-800 rounded-lg shadow-lg p-6"
+      >
         <div class="flex justify-between items-center mb-4">
           <div>
             <h3 class="text-xl font-bold text-white">選手名: {{ item.favName }}</h3>
@@ -66,9 +95,22 @@ onMounted(async () => {
             {{ item.createdAt }}
           </div>
         </div>
-        <div class="text-white font-medium border-t border-gray-700 pt-4">
-          {{ item.comment }}
+        <div class="text-white font-medium border-t border-gray-700 pt-4 flex justify-between">
+          <p>{{ item.comment }}</p>
+          <button
+            @click="openModal(item)"
+            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded"
+          >
+            削除する
+          </button>
         </div>
+        <DeleteModal
+          :is-open="isModalOpen"
+          :submitted-time="item.createdAt"
+          :full-name="item.fullName"
+          @close="onCloseDeleteModal"
+          @delete="deletePost"
+        ></DeleteModal>
       </div>
     </div>
     <div class="buttons">

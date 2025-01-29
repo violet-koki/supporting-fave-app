@@ -1,17 +1,24 @@
 <template>
-  <div class="comment-form bg-black">
+  <div class="comment-form bg-gray-900">
     <h2 class="text-white">新規コメント投稿</h2>
     <form @submit.prevent="submitComment">
       <div class="form-group">
-        <label for="image" class="text-white">画像</label>
+        <label
+          for="image"
+          class="text-white"
+        >
+          画像
+        </label>
         <input
           id="image"
           type="file"
           class="rounded border-2 border-gray-400"
-          @change="(e: Event) => {
-            const target = e.target as HTMLInputElement;
-            imageFile = target.files ? target.files[0] : null;
-          }"
+          @change="
+            (e: Event) => {
+              const target = e.target as HTMLInputElement
+              imageFile = target.files ? target.files[0] : null
+            }
+          "
         />
       </div>
       <div class="md:flex md:items-center mb-6">
@@ -78,7 +85,10 @@
       </div>
 
       <!-- プレビュー表示 -->
-      <div v-if="showPreview" class="preview font-bold">
+      <div
+        v-if="showPreview"
+        class="preview font-bold"
+      >
         <h3>プレビュー</h3>
         <p class="rounded">名前: {{ formData.fullName }}</p>
         <p class="rounded">選手名: {{ formData.favName }}</p>
@@ -93,7 +103,10 @@
         >
           {{ showPreview ? 'プレビューを隠す' : 'プレビューを表示' }}
         </button>
-        <button type="submit" class="text-white bg-gray border-2 border-gray-400 rounded">
+        <button
+          type="submit"
+          class="text-white bg-gray border-2 border-gray-400 rounded"
+        >
           投稿する
         </button>
       </div>
@@ -147,7 +160,7 @@ const submitComment = async () => {
     fullName: formData.fullName,
     favName: formData.favName,
     createdAt: new Date(),
-    userId: uid,
+    userId: uid.value,
   })
     .then(() => {
       return router.push({ name: 'registerComplete' })
@@ -156,7 +169,6 @@ const submitComment = async () => {
     .finally()
   //Todo あとでエラーハンドリング実装
 
-  // フォームのリセット
   formData.fullName = ''
   formData.favName = ''
   formData.comment = ''

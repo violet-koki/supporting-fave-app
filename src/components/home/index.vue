@@ -1,9 +1,9 @@
 <!-- HomeScreen.vue -->
 <template>
-  <div class="max-w-4xl mx-auto p-4">
+  <div class="max-w-4xl mx-auto p-4 bg-gray-900">
     <!-- ヘッダー部分 -->
     <header class="mb-6">
-      <h1 class="text-2xl font-bold mb-2">麻雀プロ応援アプリ</h1>
+      <h1 class="text-2xl font-bold mb-2 text-white">麻雀プロ応援アプリ</h1>
       <div class="flex items-center space-x-2">
         <bell-icon class="w-5 h-5" />
         <span class="text-sm">3件の新着通知があります</span>
@@ -17,13 +17,20 @@
         :key="button.id"
         class="flex items-center justify-center p-4 rounded-lg"
         :class="button.bgColor"
+        @click="goNext(button.page)"
       >
-        <component :is="button.icon" class="w-6 h-6 mr-2" />
+        <component
+          :is="button.icon"
+          class="w-6 h-6 mr-2"
+        />
         <span>{{ button.label }}</span>
       </button>
     </div>
     <div>
-      <button class="flex items-center justify-center p-4 rounded-lg bg-blue-100" @click="login">
+      <button
+        class="flex items-center justify-center p-4 rounded-lg bg-blue-100"
+        @click="login"
+      >
         サインアップ
       </button>
     </div>
@@ -32,7 +39,11 @@
     <section class="mb-6">
       <h2 class="text-xl font-bold mb-3">今日の注目対局</h2>
       <div class="space-y-3">
-        <div v-for="match in upcomingMatches" :key="match.id" class="p-3 bg-gray-50 rounded-lg">
+        <div
+          v-for="match in upcomingMatches"
+          :key="match.id"
+          class="p-3 bg-gray-50 rounded-lg"
+        >
           <div class="font-medium">{{ match.player }}</div>
           <div class="text-sm text-gray-600">{{ match.event }} - {{ match.date }}</div>
         </div>
@@ -43,7 +54,11 @@
     <section>
       <h2 class="text-xl font-bold mb-3">最新ニュース</h2>
       <div class="space-y-3">
-        <div v-for="item in news" :key="item.id" class="p-3 border-b">
+        <div
+          v-for="item in news"
+          :key="item.id"
+          class="p-3 border-b"
+        >
           <div class="font-medium">{{ item.title }}</div>
           <div class="text-sm text-gray-600">{{ item.date }}</div>
         </div>
@@ -55,6 +70,7 @@
 <script setup lang="ts">
 import { Bell, Calendar, Star, Trophy, Users } from 'lucide-vue-next'
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+import { useRouter } from 'vue-router'
 
 interface Match {
   id: number
@@ -74,8 +90,10 @@ interface MainButton {
   label: string
   icon: any // lucide-vueのコンポーネント型
   bgColor: string
+  page: string
 }
 
+const router = useRouter()
 const upcomingMatches: Match[] = [
   { id: 1, player: '堀慎吾', event: 'Mリーグ', date: '2025/1/9 19:00' },
   { id: 2, player: '佐々木寿人', event: '天鳳名人戦', date: '2025/1/10 20:00' },
@@ -110,31 +128,38 @@ const login = () => {
       // ...
     })
 }
+const goNext = (page) => {
+  router.push({ name: page })
+}
 
 const mainButtons: MainButton[] = [
   {
     id: 1,
     label: '推し日記を投稿',
     icon: Star,
-    bgColor: 'bg-blue-100',
+    bgColor: 'bg-yellow-600',
+    page: 'register',
   },
   {
     id: 2,
     label: '対局予定',
     icon: Calendar,
-    bgColor: 'bg-green-100',
+    bgColor: 'bg-blue-600',
+    page: 'gameSchedule',
   },
   {
     id: 3,
     label: '対局結果',
     icon: Trophy,
-    bgColor: 'bg-yellow-100',
+    bgColor: 'bg-indigo-600',
+    page: 'gameResult',
   },
   {
     id: 4,
     label: 'ファン広場',
     icon: Users,
-    bgColor: 'bg-purple-100',
+    bgColor: 'bg-purple-600',
+    page: 'communitySquare',
   },
 ]
 </script>
