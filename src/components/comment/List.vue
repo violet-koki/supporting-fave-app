@@ -5,12 +5,10 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth'
 import { db } from '@/firebase/index.ts'
 import { onMounted, ref, onUnmounted } from 'vue'
 import type { Post } from '@/types/post.d'
-import DeleteModal from './deleteModal.vue'
+import DeleteModal from './DeleteModal.vue'
 
 const router = useRouter()
 const uid = ref('')
-const items = ref('')
-const selectedItem = ref(null)
 const result = ref<Post[]>([])
 const isModalOpen = ref(false)
 const targetCommentId = ref<string | null>(null)
@@ -48,9 +46,8 @@ const fetchData = async () => {
 const goList = () => {
   router.push({ name: 'commentList' })
 }
-const openModal = (item) => {
+const openModal = (item: Post) => {
   isModalOpen.value = true
-  selectedItem.value = item
   targetCommentId.value = item.docId
 }
 const onCloseDeleteModal = () => {

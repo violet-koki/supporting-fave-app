@@ -128,7 +128,7 @@ const login = () => {
       // ...
     })
 }
-const goNext = (page) => {
+const goNext = (page: string) => {
   router.push({ name: page })
 }
 
@@ -137,7 +137,7 @@ const mainButtons: MainButton[] = [
     id: 1,
     label: '推し日記を投稿',
     icon: Star,
-    bgColor: 'bg-yellow-600',
+    bgColor: 'bg-red-500',
     page: 'register',
   },
   {
@@ -151,7 +151,7 @@ const mainButtons: MainButton[] = [
     id: 3,
     label: '対局結果',
     icon: Trophy,
-    bgColor: 'bg-indigo-600',
+    bgColor: 'bg-yellow-600',
     page: 'gameResult',
   },
   {
