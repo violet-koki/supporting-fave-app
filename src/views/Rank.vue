@@ -70,8 +70,8 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="channel-stats">
-    <h1 class="main-title">プロ雀士 YouTubeチャンネル統計</h1>
+  <div class="channel-stats bg-gray-900 h-screen">
+    <h1 class="main-title text-2xl font-bold text-white mb-2">プロ雀士 YouTubeチャンネル一覧</h1>
 
     <div
       v-if="loading"
@@ -147,12 +147,12 @@ onMounted(() => {
   padding: 20px;
 }
 
-.main-title {
+/* .main-title {
   font-size: 2rem;
-  color: #ff69b4;
+  color: #fff;
   text-align: center;
   margin-bottom: 2rem;
-}
+} */
 
 .loading {
   text-align: center;
@@ -227,7 +227,7 @@ onMounted(() => {
 
 .stat-value {
   font-weight: bold;
-  color: #ff69b4;
+  color: #dc2626;
 }
 
 .channel-description {
@@ -240,7 +240,7 @@ onMounted(() => {
 .channel-link {
   display: inline-block;
   padding: 0.5rem 1rem;
-  background-color: #ff69b4;
+  background-color: #dc2626;
   color: white;
   text-decoration: none;
   border-radius: 4px;

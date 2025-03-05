@@ -57,13 +57,11 @@
           </label>
         </div>
         <div class="md:w-2/3">
-          <input
-            class="bg-gray-200 appearance-none border-2 border-gray-400 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-500"
-            type="text"
-            defaultValue=""
-            placeholder="姓"
-            v-model="formData.favName"
-          />
+            <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select an option</label>
+            <select id="countries" v-model="formData.favName" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+              <option selected>選択してください</option>
+              <option v-for="option in favOptions" :key="option.value">{{  option.text }}</option>
+            </select>
         </div>
       </div>
 
@@ -120,6 +118,7 @@ import { collection, addDoc } from 'firebase/firestore'
 import { ref as storageRef, uploadBytes, getDownloadURL, getStorage } from 'firebase/storage'
 import { onAuthStateChanged, getAuth } from 'firebase/auth'
 import { db } from '@/firebase/index.ts'
+import { favOptions } from '@/util/selector/selectFav'
 
 // フォームデータの状態管理
 const formData = reactive({

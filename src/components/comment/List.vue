@@ -43,8 +43,8 @@ const fetchData = async () => {
     })
   }
 }
-const goList = () => {
-  router.push({ name: 'commentList' })
+const goHome = () => {
+  router.push({ name: 'home' })
 }
 const openModal = (item: Post) => {
   isModalOpen.value = true
@@ -116,9 +116,9 @@ onMounted(async () => {
       <button
         type="button"
         class="text-white bg-gray border-2 border-gray-400 rounded"
-        @click="goList"
+        @click="goHome"
       >
-        次へ
+        ホーム画面へ
       </button>
     </div>
   </div>
